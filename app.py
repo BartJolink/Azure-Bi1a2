@@ -1,60 +1,22 @@
 from flask import Flask, request
-import re
-from Bio.Seq import Seq
-from Bio.Blast import NCBIWWW, NCBIXML
 
-def DNA_action(text):
-    dna_seq = Seq(text.upper())
-    transcribe = dna_seq.transcribe()
-    translate = dna_seq.translate()
-
-    return """<form method="GET">
-    <input name="text">
-    <input type="submit">
-    <p>Protein sequence: {}
-    </form>""".format(translate)
-
-
-def RNA_action(text):
-    rna_seq = Seq(text.upper())
-    re_transcribe = rna_seq.back_transcribe()
-    translate = rna_seq.translate()
-
-    return """<form method="GET">
-    <input name="text">
-    <input type="submit">
-    <p>Protein sequence: {}
-    </form>""".format(translate)
-
-
-def Protein_action(text):
-    blast_record = execute_BLASTp(text)
-    title = show_results(blast_record)
-
-    return """<form method="GET">
-        <input name="text">
-        <input type="submit">
-        <p>Protein is likely to be:</br> {}
-        </form>""".format(title)
-
-def execute_BLASTp(seq):
-    result_handle = NCBIWWW.qblast("blastp", "nr", seq)
-
-    with open("my_blast.xml", "w") as out_handle:
-        out_handle.write(result_handle.read())
-    result_handle.close()
-
-    result_handle = open("my_blast.xml")
-    blast_record = NCBIXML.read(result_handle)
-
-    return blast_record
-
-def show_results(blast_record):
-    for alignment in blast_record.alignments:
-        for hsp in alignment.hsps:
-            title = alignment.title
-            break
-    return title
+gencode = {
+    'ATA':'I', 'ATC':'I', 'ATT':'I', 'ATG':'M',
+    'ACA':'T', 'ACC':'T', 'ACG':'T', 'ACT':'T',
+    'AAC':'N', 'AAT':'N', 'AAA':'K', 'AAG':'K',
+    'AGC':'S', 'AGT':'S', 'AGA':'R', 'AGG':'R',
+    'CTA':'L', 'CTC':'L', 'CTG':'L', 'CTT':'L',
+    'CCA':'P', 'CCC':'P', 'CCG':'P', 'CCT':'P',
+    'CAC':'H', 'CAT':'H', 'CAA':'Q', 'CAG':'Q',
+    'CGA':'R', 'CGC':'R', 'CGG':'R', 'CGT':'R',
+    'GTA':'V', 'GTC':'V', 'GTG':'V', 'GTT':'V',
+    'GCA':'A', 'GCC':'A', 'GCG':'A', 'GCT':'A',
+    'GAC':'D', 'GAT':'D', 'GAA':'E', 'GAG':'E',
+    'GGA':'G', 'GGC':'G', 'GGG':'G', 'GGT':'G',
+    'TCA':'S', 'TCC':'S', 'TCG':'S', 'TCT':'S',
+    'TTC':'F', 'TTT':'F', 'TTA':'L', 'TTG':'L',
+    'TAC':'Y', 'TAT':'Y', 'TAA':'_', 'TAG':'_',
+    'TGC':'C', 'TGT':'C', 'TGA':'_', 'TGG':'W'}
 
 app = Flask(__name__)
 
@@ -62,23 +24,20 @@ app = Flask(__name__)
 @app.route('/', methods=['GET', 'POST'])
 def my_form_post():
     text = request.args.get("text","")
-    if bool(re.match('^[ATGCN]', text.upper())) == True:
-        return DNA_action(text)
-    elif bool(re.match('^[AUGCN]', text.upper())) == True:
-        return RNA_action(text)
-    elif bool(re.match('^[GALMFWKQESPVICYHRNDT]', text.upper())) == True:
-        return Protein_action(text)
-    else:
-        return """<form method="GET">
-            <input name="text">
-            <input type="submit">
-            <p>Sequence is Invalid!!
-            </form>"""
-
-
-
+    protein_sequence = ""
+    for i in range(len(text)):
+        if i%3 == 0:
+            if i < (len(text)-2):
+                codon = text[i:i+3].upper()
+                protein = gencode[codon]
+                print(protein)
+                protein_sequence += protein
+    return """<form method="GET">
+    <input name="text">
+    <input type="submit">
+    <p>Protein sequence: {}
+    </form>""".format(protein_sequence)
 
 
 if __name__ == '__main__':
     app.run(debug=True)
-
