@@ -1,43 +1,62 @@
 from flask import Flask, request
-
-gencode = {
-    'ATA':'I', 'ATC':'I', 'ATT':'I', 'ATG':'M',
-    'ACA':'T', 'ACC':'T', 'ACG':'T', 'ACT':'T',
-    'AAC':'N', 'AAT':'N', 'AAA':'K', 'AAG':'K',
-    'AGC':'S', 'AGT':'S', 'AGA':'R', 'AGG':'R',
-    'CTA':'L', 'CTC':'L', 'CTG':'L', 'CTT':'L',
-    'CCA':'P', 'CCC':'P', 'CCG':'P', 'CCT':'P',
-    'CAC':'H', 'CAT':'H', 'CAA':'Q', 'CAG':'Q',
-    'CGA':'R', 'CGC':'R', 'CGG':'R', 'CGT':'R',
-    'GTA':'V', 'GTC':'V', 'GTG':'V', 'GTT':'V',
-    'GCA':'A', 'GCC':'A', 'GCG':'A', 'GCT':'A',
-    'GAC':'D', 'GAT':'D', 'GAA':'E', 'GAG':'E',
-    'GGA':'G', 'GGC':'G', 'GGG':'G', 'GGT':'G',
-    'TCA':'S', 'TCC':'S', 'TCG':'S', 'TCT':'S',
-    'TTC':'F', 'TTT':'F', 'TTA':'L', 'TTG':'L',
-    'TAC':'Y', 'TAT':'Y', 'TAA':'_', 'TAG':'_',
-    'TGC':'C', 'TGT':'C', 'TGA':'_', 'TGG':'W'}
+import mysql.connector
+import sys
+import re
 
 app = Flask(__name__)
 
+def set_connection():
+    SQL_connection = mysql.connector.connect(
+        host="ensembldb.ensembl.org",
+        user="anonymous",
+        db="homo_sapiens_core_95_38")
 
-@app.route('/', methods=['GET', 'POST'])
-def my_form_post():
-    text = request.args.get("text","")
-    protein_sequence = ""
-    for i in range(len(text)):
-        if i%3 == 0:
-            if i < (len(text)-2):
-                codon = text[i:i+3].upper()
-                protein = gencode[codon]
-                print(protein)
-                protein_sequence += protein
+    return SQL_connection
+
+
+def run_querry(searchterm):
+    try:
+        SQL_connection = set_connection()
+    except:
+        print("Connection failure, please make sure you're connected to "
+         "the internet.")
+        sys.exit()
+
+    if searchterm != "":
+        cursor = SQL_connection.cursor()
+        cursor.execute(
+                        "select description "
+                        "from gene "
+                        "where description like '%{}%';".format(
+                            searchterm))
+
+        results = cursor.fetchall()
+        cursor.close()
+        SQL_connection.close()
+
+        formatted_results = ""
+        for result in results:
+            index = re.search(searchterm.upper(), result[0].upper())
+            if index is None:
+                formatted_results += str(result[0]) + "</br></br>"
+            else:
+                index = index.start()
+                print(index)
+                formatted_results += str(result[0][0:index])+'<b><font color="red">'+str(result[0][index:index+len(searchterm)])+"</b></font>"+str(result[0][index+len(searchterm):]) + "</br></br>"
+    else:
+        formatted_results = ""
+
     return """<form method="GET">
+    <head>Fill in your searchterm</br></head>
     <input name="text">
     <input type="submit">
-    <p>Protein sequence: {}
-    </form>""".format(protein_sequence)
+    <p>Results found:</br> {}
+    </form>""".format(formatted_results)
 
+@app.route('/', methods=['GET', 'POST'])
+def my_form():
+    searchterm = request.args.get("text","")
+    return run_querry(searchterm)
 
 if __name__ == '__main__':
     app.run(debug=True)
