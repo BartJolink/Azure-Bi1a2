@@ -26,11 +26,11 @@ def run_querry(searchterm):
     if searchterm != "":
         cursor = SQL_connection.cursor()
         cursor.execute(
-                        "select *"
-                        "from blast_resultaten"
-                        "where Title like '{}'"
-                        "or acessiecode like '{}'"
-                        "or organisme like '{}';".format(
+                        "select Title "
+                        "from blast_resultaten "
+                        "where Title like '%{}%' "
+                        "or acessiecode like '%{}%' "
+                        "or organisme like '%{}%';".format(
                             searchterm, searchterm, searchterm))
 
         results = cursor.fetchall()
