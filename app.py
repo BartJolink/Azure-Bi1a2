@@ -7,9 +7,10 @@ app = Flask(__name__)
 
 def set_connection():
     SQL_connection = mysql.connector.connect(
-        host="ensembldb.ensembl.org",
-        user="anonymous",
-        db="homo_sapiens_core_95_38")
+        host="hannl-hlo-bioinformatica-mysqlsrv.mysql.database.azure.com",
+        user="ossux@hannl-hlo-bioinformatica-mysqlsrv",
+        db="Ossux",
+        password="haha1234")
 
     return SQL_connection
 
@@ -25,10 +26,12 @@ def run_querry(searchterm):
     if searchterm != "":
         cursor = SQL_connection.cursor()
         cursor.execute(
-                        "select description "
-                        "from gene "
-                        "where description like '%{}%';".format(
-                            searchterm))
+                        "select *"
+                        "from blast_resultaten"
+                        "where Title like '{}'"
+                        "or acessiecode like '{}'"
+                        "or organisme like '{}';".format(
+                            searchterm, searchterm, searchterm))
 
         results = cursor.fetchall()
         cursor.close()
