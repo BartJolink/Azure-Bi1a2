@@ -15,7 +15,7 @@ def set_connection():
     return SQL_connection
 
 
-def run_querry(searchterm):
+def run_querry(searchterm, order_by, order):
     try:
         SQL_connection = set_connection()
     except:
@@ -23,15 +23,16 @@ def run_querry(searchterm):
          "the internet.")
         sys.exit()
 
-    if searchterm != "":
+    try:
         cursor = SQL_connection.cursor()
         cursor.execute(
-                        "select Title "
+                        "select * "
                         "from blast_resultaten "
                         "where Title like '%{}%' "
                         "or acessiecode like '%{}%' "
-                        "or organisme like '%{}%';".format(
-                            searchterm, searchterm, searchterm))
+                        "or organisme like '%{}%'"
+                        "order by {} {};".format(
+                            searchterm, searchterm, searchterm, order_by, order))
 
         results = cursor.fetchall()
         cursor.close()
@@ -39,27 +40,59 @@ def run_querry(searchterm):
 
         formatted_results = ""
         for result in results:
-            index = re.search(searchterm.upper(), result[0].upper())
-            if index is None:
-                formatted_results += str(result[0]) + "</br></br>"
-            else:
-                index = index.start()
-                print(index)
-                formatted_results += str(result[0][0:index])+'<b><font color="red">'+str(result[0][index:index+len(searchterm)])+"</b></font>"+str(result[0][index+len(searchterm):]) + "</br></br>"
-    else:
-        formatted_results = ""
+            for i in result:
+                formatted_results += str(i) + '&nbsp;&nbsp;'
+            formatted_results += "</br></br>"
 
-    return """<form method="GET">
-    <head>Fill in your searchterm</br></head>
-    <input name="text">
-    <input type="submit">
-    <p>Results found:</br> {}
-    </form>""".format(formatted_results)
+
+        return """<form method="GET">
+        <head>Search:</br></head>
+        <input name="text"></br>
+        <p1>Order by:</p1></br>
+        <select name="order_by">
+        <option value="Title">Title</option>
+        <option value="accessioncode">Accession code</option>
+        <option value="e_value">E-value</option>
+        <option value="max_score">Max score</option>
+        <option value="length">Length</option>
+        <option value="organisme">Organism</option>
+        <option value="blast_id">Blast_ID</option>
+        </select>
+        <input type="radio" name="order" value="desc"> Desc
+        <input type="radio" name="order" value="asc"> Asc
+        </br><br>
+        <input type="submit" value="Search">
+        <p>Results found:</br> {}
+        </form>""".format(formatted_results)
+
+    except:
+        return """<form method="GET">
+        <head>Search:</br></head>
+        <input name="text"></br>
+        <p1>Order by:</p1></br>
+        <select name="order_by">
+        <option value="Title">Title</option>
+        <option value="accessioncode">Accession code</option>
+        <option value="e_value">E-value</option>
+        <option value="max_score">Max score</option>
+        <option value="length">Length</option>
+        <option value="organisme">Organism</option>
+        <option value="blast_id">Blast_ID</option>
+        </select>
+        <input type="radio" name="order" value="desc"> Desc
+        <input type="radio" name="order" value="asc"> Asc
+        </br><br>
+        <input type="submit" value="Search">
+        <p>Results found:</br> 
+        </form>"""
 
 @app.route('/', methods=['GET', 'POST'])
 def my_form():
     searchterm = request.args.get("text","")
-    return run_querry(searchterm)
+    order_by = request.args.get("order_by", "")
+    order = request.args.get("order", "")
+    print(order)
+    return run_querry(searchterm, order_by, order)
 
 if __name__ == '__main__':
     app.run(debug=True)
