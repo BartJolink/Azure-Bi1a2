@@ -38,52 +38,73 @@ def run_querry(searchterm, order_by, order):
         cursor.close()
         SQL_connection.close()
 
-        formatted_results = ""
+        table = '<table>' \
+                '<tr bgcolor="#E0FFFF">' \
+                "<th>Title</th>" \
+                "<th>Accessioncode</th>" \
+                "<th>E-value</th>" \
+                "<th>Total score</th>" \
+                "<th>Max score</th>" \
+                "<th>Query cover</th>" \
+                "<th>Identities</th>" \
+                "<th>Gaps</th>" \
+                "<th>Sequentie ID</th>" \
+                "<th>Length</th>" \
+                "<th>Organism</th>" \
+                "<th>Blast_ID</th>" \
+                " </tr>" \
+
+        formatted_table = table
         for result in results:
+            formatted_table += '<tr bgcolor="#F0F8FF">'
             for i in result:
-                formatted_results += str(i) + '&nbsp;&nbsp;'
-            formatted_results += "</br></br>"
+                formatted_table += '<td>' + str(i) + '</td>'
+            formatted_table += "</tr>"
+
+
 
 
         return """<form method="GET">
-        <head>Search:</br></head>
-        <input name="text"></br>
+        <head><font face="verdana">Search:</br></head>
+        <input name="text "></br>
         <p1>Order by:</p1></br>
         <select name="order_by">
         <option value="Title">Title</option>
-        <option value="accessioncode">Accession code</option>
+        <option value="acessiecode">Accession code</option>
         <option value="e_value">E-value</option>
         <option value="max_score">Max score</option>
         <option value="length">Length</option>
         <option value="organisme">Organism</option>
         <option value="blast_id">Blast_ID</option>
         </select>
+        <input type="radio" name="order" value="asc" checked> Asc
         <input type="radio" name="order" value="desc"> Desc
-        <input type="radio" name="order" value="asc"> Asc
         </br><br>
         <input type="submit" value="Search">
-        <p>Results found:</br> {}
-        </form>""".format(formatted_results)
+        <p>Results found:</br></font> {}
+        </table>
+        </form>""".format(formatted_table)
 
     except:
         return """<form method="GET">
-        <head>Search:</br></head>
+        <head><font face="verdana">Search:</br></head>
         <input name="text"></br>
         <p1>Order by:</p1></br>
         <select name="order_by">
         <option value="Title">Title</option>
-        <option value="accessioncode">Accession code</option>
+        <option value="acessiecode">Accession code</option>
         <option value="e_value">E-value</option>
         <option value="max_score">Max score</option>
         <option value="length">Length</option>
         <option value="organisme">Organism</option>
         <option value="blast_id">Blast_ID</option>
         </select>
+        <input type="radio" name="order" value="asc" checked> Asc
         <input type="radio" name="order" value="desc"> Desc
-        <input type="radio" name="order" value="asc"> Asc
         </br><br>
         <input type="submit" value="Search">
-        <p>Results found:</br> 
+        <p>Results found:</br></font>
+        </table>
         </form>"""
 
 @app.route('/', methods=['GET', 'POST'])
