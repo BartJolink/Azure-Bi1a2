@@ -66,24 +66,27 @@ def run_querry(searchterm, order_by, order):
 
         return """<form method="GET">
         <head><font face="verdana">Search:</br></head>
-        <input name="text "></br>
+        <input name="text"></br>
         <p1>Order by:</p1></br>
         <select name="order_by">
+        <option value="blast_id">Blast_ID</option>
         <option value="Title">Title</option>
         <option value="acessiecode">Accession code</option>
         <option value="e_value">E-value</option>
         <option value="max_score">Max score</option>
+        <option value="query_cover">Query cover</option>
+        <option value="perc_identity">Identity %</option>
         <option value="length">Length</option>
         <option value="organisme">Organism</option>
-        <option value="blast_id">Blast_ID</option>
         </select>
-        <input type="radio" name="order" value="asc" checked> Asc
-        <input type="radio" name="order" value="desc"> Desc
+        <input type="radio" name="order" value="asc" checked> Asc>
+        <input type="radio" name="order" value="desc"> Desc>
         </br><br>
         <input type="submit" value="Search">
+        </form>
         <p>Results found:</br></font> {}
         </table>
-        </form>""".format(formatted_table)
+        """.format(formatted_table)
 
     except:
         return """<form method="GET">
@@ -91,28 +94,30 @@ def run_querry(searchterm, order_by, order):
         <input name="text"></br>
         <p1>Order by:</p1></br>
         <select name="order_by">
+        <option value="blast_id">Blast_ID</option>
         <option value="Title">Title</option>
         <option value="acessiecode">Accession code</option>
         <option value="e_value">E-value</option>
         <option value="max_score">Max score</option>
+        <option value="query_cover">Query cover</option>
+        <option value="perc_identity">Identity %</option>
         <option value="length">Length</option>
         <option value="organisme">Organism</option>
-        <option value="blast_id">Blast_ID</option>
         </select>
-        <input type="radio" name="order" value="asc" checked> Asc
-        <input type="radio" name="order" value="desc"> Desc
-        </br><br>
+        <input type="radio" name="order" value="asc" checked> Asc>
+        <input type="radio" name="order" value="desc"> Desc>
+        <br><br>
         <input type="submit" value="Search">
+        </form>
         <p>Results found:</br></font>
         </table>
-        </form>"""
+        """
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
 def my_form():
-    searchterm = request.args.get("text","")
+    searchterm = request.args.get("text", "")
     order_by = request.args.get("order_by", "")
     order = request.args.get("order", "")
-    print(order)
     return run_querry(searchterm, order_by, order)
 
 if __name__ == '__main__':
