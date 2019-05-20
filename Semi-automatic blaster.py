@@ -2,9 +2,9 @@ import xlrd
 from Bio.Blast import NCBIWWW, NCBIXML
 import pickle
 import mysql.connector
+import time
 
 def main():
-    ## Executing the blast and parsing the results to a pickle dump file
     sequences, names, scores = get_sequences()
     get_results(sequences, names, scores)
 
@@ -30,12 +30,14 @@ def get_sequences():
 
 
 def get_results(sequences, names, scores):
-    for i in range(5): #Change to length of sequences/reads
-        sequentie_id = i+1
+    blasts_done = 0 # to pick up blasting in a later time..
+    for i in range(len(sequences)-blasts_done):
+        if i not in sequences_blasted:
+        sequentie_id = i+1+blasts_done
         print("Currently Blasting: #"+str(sequentie_id))
-        print(sequences[i])
-        print(names[i])
-        blast_record = execute_BLASTx(sequences[i+50])
+        print(sequences[i+blasts_done])
+        print(names[i+blasts_done])
+        blast_record = execute_BLASTx(sequences[i+blasts_done])
         titles, accessioncodes, max_scores, query_cover, identities, gaps, \
         organisms, protein_names, sequence_header, lengths, e_values, \
         querys, matches, subjects = create_lists(blast_record)
@@ -44,7 +46,8 @@ def get_results(sequences, names, scores):
                      organisms, protein_names, sequence_header,
                      lengths, e_values,
                      querys, matches, subjects)
-        fill_database(sequentie_id, sequences[i], scores[i], names[i])
+        fill_database(sequentie_id, sequences[i+blasts_done], scores[i+blasts_done], names[i+blasts_done])
+        time.sleep(180)
 
 
 def execute_BLASTx(seq):
@@ -61,28 +64,40 @@ def execute_BLASTx(seq):
 
 
 def create_lists(blast_record):
+    result_count = 0
     titles, accessioncodes, max_scores, query_cover, identities, gaps,\
     organisms, protein_names, sequence_header, lengths, e_values, \
     querys, matches, subjects = [],[],[],[],[],[],[],[],[],[],[],[],[],[]
     for alignment in blast_record.alignments:
         for hsp in alignment.hsps:
-            if hsp.expect < 1.0e-10:
-                titles.append(alignment.title)
-                accessioncodes.append(alignment.title.split("|")[3])
-                max_scores.append(hsp.bits)
-                query_cover.append(float((hsp.query_end-hsp.query_start)
-                                         /300)*100)
-                identities.append((hsp.identities/hsp.align_length)*100)
-                gaps.append(hsp.gaps)
-                organisms.append(alignment.title.split(">")[0].split("|")
-                                 [4].split("[")[1][:-1].strip("]"))
-                protein_names.append(alignment.title.split("|")[4]
-                                     .split("[")[0][1:])
-                lengths.append(alignment.length)
-                e_values.append(hsp.expect)
-                querys.append(hsp.query)
-                matches.append(hsp.match)
-                subjects.append(hsp.sbjct)
+            if result_count < 10:
+                if hsp.expect < 1e-3:
+                    titles.append(alignment.title.replace("'",""))
+                    print(alignment.title)
+                    accessioncodes.append(alignment.accession)
+                    print(accessioncodes)
+                    max_scores.append(hsp.bits)
+                    query_cover.append(float((hsp.query_end-hsp.query_start)
+                                             /300)*100)
+                    identities.append((hsp.identities/hsp.align_length)*100)
+                    gaps.append(hsp.gaps)
+                    if alignment.title[0:2] == 'gi':
+                        organisms.append(alignment.title.split(">")[0]
+                                         .split("|")[4].split("[")[1]
+                                         [:-1].strip("]").replace("'",""))
+                    else:
+                        organisms.append(alignment.title.split(">")[0]
+                                         .split("|")[2].split("[")[1]
+                                         [:-1].strip("]").replace("'",""))
+                    protein_names.append(alignment.title.split("|")[2]
+                                         .split("[")[0][1:].replace("'",""))
+                    lengths.append(alignment.length)
+                    e_values.append(hsp.expect)
+                    querys.append(hsp.query)
+                    matches.append(hsp.match)
+                    subjects.append(hsp.sbjct)
+                    result_count += 1
+
 
     return titles, accessioncodes, max_scores, query_cover, identities, \
            gaps, organisms, protein_names, sequence_header, lengths, \
@@ -131,7 +146,6 @@ def fill_database(sequentie_id, sequence, score, name):
         subjects = pickle.load(f)
 
     password = 'haha1234'
-
     for i in range(len(titles)):
         SQL_connection = set_connection(password)
         cursor = SQL_connection.cursor()
@@ -154,8 +168,10 @@ def fill_database(sequentie_id, sequence, score, name):
                             accessioncodes[i]))
         results = cursor.fetchone()
         if results is None:
-            cursor.execute("insert into proteine(prot_sequentie, eiwitnaam, acessiecode)"
-                       "values('{}', '{}', '{}');".format(subjects[i], protein_names[i], accessioncodes[i]))
+            cursor.execute("insert into proteine(prot_sequentie, "
+                           "eiwitnaam, acessiecode)"
+                       "values('{}', '{}', '{}');".format(subjects[i],
+                                protein_names[i], accessioncodes[i]))
             SQL_connection.commit()
         cursor.execute("insert into sequentie(header, nucl_sequentie, score)"
                        "values ('{}', '{}', '{}');".format(name, sequence, score))
