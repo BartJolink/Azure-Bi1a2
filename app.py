@@ -506,11 +506,11 @@ function onClick(element) {{
 </html>""".format(formatted_table)
 
 def execute_BLASTp(seq):
-    # result_handle = NCBIWWW.qblast("blastp", "nr", seq)
-    #
-    # with open("my_blast.xml", "w") as out_handle:
-    #     out_handle.write(result_handle.read())
-    # result_handle.close()
+    result_handle = NCBIWWW.qblast("blastp", "nr", seq)
+    
+    with open("my_blast.xml", "w") as out_handle:
+        out_handle.write(result_handle.read())
+    result_handle.close()
 
     result_handle = open("my_blast.xml")
     blast_record = NCBIXML.read(result_handle)
