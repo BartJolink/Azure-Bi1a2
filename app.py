@@ -116,7 +116,7 @@ style="margin-top:75px">
 style="margin-top:75px">
 <h1 class="w3-xxxlarge w3-text-red"><b>Overzicht</b></h1>
 <hr style="width:50px;border:5px solid red" class="w3-round">
-<p>Hieronder is een pie charm weergegeven over de 10 meest 
+<p>Hieronder is een pie chart weergegeven over de 10 meest 
 voorkomende organismen in de database die is opgezet.
     De database bevat de resultaten van het onderzoek. 
     (meer over het onderzoek bij kopje 'Tabel')</p>
@@ -411,7 +411,7 @@ style="margin-top:75px">
 style="margin-top:75px">
 <h1 class="w3-xxxlarge w3-text-red"><b>Overzicht</b></h1>
 <hr style="width:50px;border:5px solid red" class="w3-round">
-<p>Hieronder is een pie charm weergegeven over de 10 meest 
+<p>Hieronder is een pie chart weergegeven over de 10 meest 
 voorkomende organismen in de database die is opgezet.
     De database bevat de resultaten van het onderzoek. 
     (meer over het onderzoek bij kopje 'Tabel')</p>
@@ -706,7 +706,7 @@ style="margin-top:75px">
 style="margin-top:75px">
 <h1 class="w3-xxxlarge w3-text-red"><b>Overzicht</b></h1>
 <hr style="width:50px;border:5px solid red" class="w3-round">
-<p>Hieronder is een pie charm weergegeven over de 10 meest 
+<p>Hieronder is een pie chart weergegeven over de 10 meest 
 voorkomende organismen in de database die is opgezet.
     De database bevat de resultaten van het onderzoek. 
     (meer over het onderzoek bij kopje 'Tabel')</p>
@@ -1003,7 +1003,7 @@ style="margin-top:75px">
 style="margin-top:75px">
 <h1 class="w3-xxxlarge w3-text-red"><b>Overzicht</b></h1>
 <hr style="width:50px;border:5px solid red" class="w3-round">
-<p>Hieronder is een pie charm weergegeven over de 10 meest 
+<p>Hieronder is een pie chart weergegeven over de 10 meest 
 voorkomende organismen in de database die is opgezet.
     De database bevat de resultaten van het onderzoek. 
     (meer over het onderzoek bij kopje 'Tabel')</p>
@@ -1307,7 +1307,7 @@ style="margin-top:75px">
 style="margin-top:75px">
 <h1 class="w3-xxxlarge w3-text-red"><b>Overzicht</b></h1>
 <hr style="width:50px;border:5px solid red" class="w3-round">
-<p>Hieronder is een pie charm weergegeven over de 10 meest 
+<p>Hieronder is een pie chart weergegeven over de 10 meest 
 voorkomende organismen in de database die is opgezet.
     De database bevat de resultaten van het onderzoek. 
     (meer over het onderzoek bij kopje 'Tabel')</p>
@@ -1502,6 +1502,13 @@ app = Flask(__name__)
 
 
 def set_connection():
+    """"This function sets a connection to a database (Ossux).
+    (During blasting password input was pre-filled. For privacy reasons,
+    the password was changed to an input field)
+    Input is a password.
+    Output is an SQL_connection.
+    """
+
     SQL_connection = mysql.connector.connect(
         host="hannl-hlo-bioinformatica-mysqlsrv.mysql.database.azure.com",
         user="ossux@hannl-hlo-bioinformatica-mysqlsrv",
@@ -1512,6 +1519,13 @@ def set_connection():
 
 
 def run_querry(searchterm, order_by, order, html1, html2):
+    """"This function runs a querry which returns results based on a
+    given searchterm. This is presented afterwards in a html file.
+    Input is a searchterm, a way to order the results and formats for
+    html to return.
+    It returns a formatted html format.
+    """
+
     try:
         SQL_connection = set_connection()
     except:
@@ -1519,7 +1533,6 @@ def run_querry(searchterm, order_by, order, html1, html2):
               " the internet.")
         sys.exit()
     try:
-        formatted_table = ""
         cursor = SQL_connection.cursor()
         cursor.execute(
             "select * "
@@ -1561,10 +1574,15 @@ def run_querry(searchterm, order_by, order, html1, html2):
 
         return html1.format(formatted_table)
     except:
-        return html2.format(formatted_table)
+        return html2.format("")
 
 
 def run_taxonomy(searchterm, html3, html4):
+    """"This function runs a querry which returns a taxonomy table based
+    on a given searchterm. This is presented afterwards in a html file.
+    Input is a searchterm and formats for html to return.
+    It returns a formatted html format.
+    """
     try:
         SQL_connection = set_connection()
     except:
@@ -1636,12 +1654,15 @@ def run_taxonomy(searchterm, html3, html4):
 
         return html4.format(formatted_table)
     except:
-        pass
+        return html2.format("")
 
 
 def execute_BLASTp(seq):
+    """"This function uses NCBIWWW.qblast to perform a blastx.
+     It takes an sequence as input.
+     It returns a blast_record as output.
+     """
     result_handle = NCBIWWW.qblast("blastp", "nr", seq)
-    ## rechten azure file verhogen.
     with open("my_blast.xml", "w") as out_handle:
         out_handle.write(result_handle.read())
     result_handle.close()
@@ -1653,6 +1674,11 @@ def execute_BLASTp(seq):
 
 
 def show_results(blast_record):
+    """"This function shows the results from a blast_record.
+    It takes the blast_record as input.
+    It gives results (html) as output.
+    """
+
     results = []
     counter = 0
     for alignment in blast_record.alignments:
@@ -1671,6 +1697,12 @@ def show_results(blast_record):
 
 
 def run_blast(blast, html5):
+    """"This function directs multiple functions to run a blastp
+    and return the results.
+    Input is a protein sequence to blast.
+    Output is a formatted hmtl format which shows blastp results.
+    """
+
     blast_record = execute_BLASTp(blast)
     results = show_results(blast_record)
 
@@ -1683,6 +1715,10 @@ def run_blast(blast, html5):
 
 @app.route('/', methods=['GET'])
 def my_form():
+    """"This function collects inputs of multiple searchbars and
+    radiobuttons.
+    Input is data from webpage with 'GET'.
+    Output is one of multiple functions to adapt the shown webpage."""
     searchterm = request.args.get("text", "")
     order_by = request.args.get("order_by", "")
     order = request.args.get("order", "")
