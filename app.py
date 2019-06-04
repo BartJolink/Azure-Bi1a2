@@ -1662,12 +1662,7 @@ def execute_BLASTp(seq):
      It takes an sequence as input.
      It returns a blast_record as output.
      """
-    result_handle = NCBIWWW.qblast("blastp", "nr", seq)
-    # with open("my_blast.xml", "w") as out_handle:
-    #     out_handle.write(result_handle.read())
-    # result_handle.close()
-    #
-    # result_handle = open("my_blast.xml")
+    result_handle = NCBIWWW.qblast("blastx", "nr", seq)
     blast_record = NCBIXML.read(result_handle)
 
     return blast_record
