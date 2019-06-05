@@ -1,6 +1,6 @@
 ## Author: Bart Jolink
 ## Date: 29-05-2019
-## Script for automatic adding taxonomy to Taxonomie database table.
+## Script for automatic updating taxonomy_ID to blast_resultaten database table.
 
 from ete3 import NCBITaxa
 from Bio import Entrez
