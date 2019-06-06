@@ -12,9 +12,10 @@ ncbi = NCBITaxa()
 
 
 def main():
-    """"This function directs four functions.
-    It takes a password as input. 
+    """"This function directs two functions.
+    It takes a password (for database connection) as input.
     """
+    
     password = input("Fill in your password: ")
     results = run_query(password)
     organism_names = get_organism_names(results)
