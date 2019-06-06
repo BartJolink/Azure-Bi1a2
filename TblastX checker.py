@@ -10,6 +10,9 @@ import time
 
 
 def main():
+    """"This function directs two functions.
+    """
+    
     sequences, names, scores = get_sequences()
     get_results(sequences, names, scores)
 
