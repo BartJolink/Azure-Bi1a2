@@ -1,3 +1,10 @@
+## Author: Bart Jolink
+## Date: 29-05-2019
+## Application for webpage, used for search querrys in database.
+
+## HTML-code +- line 1 t/m 1500
+## Python-code +- line 1500 t/m 1750
+
 html1 = """<!DOCTYPE html>
 <html lang="en">
 <title>Micro organismen in champost</title>
@@ -1583,6 +1590,7 @@ def run_taxonomy(searchterm, html3, html4):
     Input is a searchterm and formats for html to return.
     It returns a formatted html format.
     """
+    
     try:
         SQL_connection = set_connection()
     except:
@@ -1662,6 +1670,7 @@ def execute_BLASTp(seq):
      It takes an sequence as input.
      It returns a blast_record as output.
      """
+    
     result_handle = NCBIWWW.qblast("blastx", "nr", seq)
     blast_record = NCBIXML.read(result_handle)
 
@@ -1713,7 +1722,9 @@ def my_form():
     """"This function collects inputs of multiple searchbars and
     radiobuttons.
     Input is data from webpage with 'GET'.
-    Output is one of multiple functions to adapt the shown webpage."""
+    Output is one of multiple functions to adapt the shown webpage.
+    """
+    
     searchterm = request.args.get("text", "")
     order_by = request.args.get("order_by", "")
     order = request.args.get("order", "")
