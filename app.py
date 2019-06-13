@@ -1,10 +1,3 @@
-## Author: Bart Jolink
-## Date: 29-05-2019
-## Application for webpage, used for search querrys in database.
-
-## HTML-code +- line 1 t/m 1500
-## Python-code +- line 1500 t/m 1750
-
 html1 = """<!DOCTYPE html>
 <html lang="en">
 <title>Micro organismen in champost</title>
@@ -258,10 +251,10 @@ script/canvasjs.min.js"></script>
   <div class="w3-container" id="blasten" style="margin-top:75px">
     <h1 class="w3-xxxlarge w3-text-red"><b>Zelf blasten</b></h1>
     <hr style="width:50px;border:5px solid red" class="w3-round">
-      <p> Hieronder kunt u zelf een Sequentie invoeren die vervolgens 
+      <p> Hieronder kunt u zelf een DNA sequentie invoeren die vervolgens 
       geblast wordt.</p>
       <form method="GET">
-        <head><font face="Poppins">Voer een sequentie in:</br></head>
+        <head><font face="Poppins">Voer een DNA sequentie in:</br></head>
         <input name="blast">
         <input type="submit" value="Blast">
         <br><br>
@@ -553,10 +546,10 @@ script/canvasjs.min.js"></script>
   <div class="w3-container" id="blasten" style="margin-top:75px">
     <h1 class="w3-xxxlarge w3-text-red"><b>Zelf blasten</b></h1>
     <hr style="width:50px;border:5px solid red" class="w3-round">
-      <p> Hieronder kunt u zelf een Sequentie invoeren die vervolgens 
+      <p> Hieronder kunt u zelf een DNA sequentie invoeren die vervolgens 
       geblast wordt.</p>
       <form method="GET">
-        <head><font face="Poppins">Voer een sequentie in:</br></head>
+        <head><font face="Poppins">Voer een DNA sequentie in:</br></head>
         <input name="blast">
         <input type="submit" value="Blast">
         <br><br>
@@ -850,10 +843,10 @@ script/canvasjs.min.js"></script>
   <div class="w3-container" id="blasten" style="margin-top:75px">
     <h1 class="w3-xxxlarge w3-text-red"><b>Zelf blasten</b></h1>
     <hr style="width:50px;border:5px solid red" class="w3-round">
-      <p> Hieronder kunt u zelf een Sequentie invoeren die vervolgens 
+      <p> Hieronder kunt u zelf een DNA sequentie invoeren die vervolgens 
       geblast wordt.</p>
       <form method="GET">
-        <head><font face="Poppins">Voer een sequentie in:</br></head>
+        <head><font face="Poppins">Voer een DNA sequentie in:</br></head>
         <input name="blast">
         <input type="submit" value="Blast">
         <br><br>
@@ -1151,10 +1144,10 @@ style="margin-top:75px">
 <div class="w3-container" id="blasten" style="margin-top:75px">
 <h1 class="w3-xxxlarge w3-text-red"><b>Zelf blasten</b></h1>
 <hr style="width:50px;border:5px solid red" class="w3-round">
-  <p> Hieronder kunt u zelf een Sequentie invoeren die 
+  <p> Hieronder kunt u zelf een DNA sequentie invoeren die 
   vervolgens geblast wordt.</p>
   <form method="GET">
-    <head><font face="Poppins">Voer een sequentie in:
+    <head><font face="Poppins">Voer een DNA sequentie in:
     </br></head>
     <input name="blast">
     <input type="submit" value="Blast">
@@ -1455,10 +1448,10 @@ style="margin-top:75px">
   <div class="w3-container" id="blasten" style="margin-top:75px">
     <h1 class="w3-xxxlarge w3-text-red"><b>Zelf blasten</b></h1>
     <hr style="width:50px;border:5px solid red" class="w3-round">
-      <p> Hieronder kunt u zelf een Sequentie invoeren die vervolgens 
+      <p> Hieronder kunt u zelf een DNA sequentie invoeren die vervolgens 
       geblast wordt.</p>
       <form method="GET">
-        <head><font face="Poppins">Voer een sequentie in:</br></head>
+        <head><font face="Poppins">Voer een DNA sequentie in:</br></head>
         <input name="blast">
         <input type="submit" value="Blast">
         {}
@@ -1590,7 +1583,7 @@ def run_taxonomy(searchterm, html3, html4):
     Input is a searchterm and formats for html to return.
     It returns a formatted html format.
     """
-    
+
     try:
         SQL_connection = set_connection()
     except:
@@ -1670,7 +1663,7 @@ def execute_BLASTp(seq):
      It takes an sequence as input.
      It returns a blast_record as output.
      """
-    
+
     result_handle = NCBIWWW.qblast("blastx", "nr", seq)
     blast_record = NCBIXML.read(result_handle)
 
@@ -1724,7 +1717,7 @@ def my_form():
     Input is data from webpage with 'GET'.
     Output is one of multiple functions to adapt the shown webpage.
     """
-    
+
     searchterm = request.args.get("text", "")
     order_by = request.args.get("order_by", "")
     order = request.args.get("order", "")
