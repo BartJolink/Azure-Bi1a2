@@ -1,0 +1,64 @@
+CREATE TABLE Blast_resultaten (
+    Title varchar(100)  NOT NULL,
+    acessiecode varchar(20)  NOT NULL,
+    E_value float  NOT NULL,
+    total_score int  NULL,
+    max_score int  NOT NULL,
+    query_cover float  NOT NULL,
+    perc_identity float  NOT NULL,
+    gaps int  NOT NULL,
+    sequentie_id int  NOT NULL ,
+    length int  NOT NULL,
+    organisme varchar(50)  NOT NULL,
+    blast_id int  NOT NULL AUTO_INCREMENT,
+    taxonomy_ID int,
+    CONSTRAINT Blast_resultaten_pk PRIMARY KEY (blast_id)
+);
+
+-- Table: proteine
+CREATE TABLE proteine (
+    prot_sequentie varchar(350)  NOT NULL,
+    eiwitnaam varchar(60)  NOT NULL,
+    acessiecode varchar(20)  NOT NULL,
+    CONSTRAINT proteine_pk PRIMARY KEY (acessiecode)
+);
+
+-- Table: sequentie
+CREATE TABLE sequentie (
+    header varchar(100)  NOT NULL,
+    nucl_sequentie varchar(350)  NOT NULL,
+    score varchar(350)  NOT NULL,
+    sequentie_id int  NOT NULL AUTO_INCREMENT,
+    CONSTRAINT sequentie_pk PRIMARY KEY (sequentie_id)
+);
+
+-- foreign keys
+-- Reference: Blast_resultaten_sequentie (table: Blast_resultaten)
+ALTER TABLE Blast_resultaten ADD CONSTRAINT Blast_resultaten_sequentie
+    FOREIGN KEY (sequentie_id)
+    REFERENCES sequentie (sequentie_id)
+;
+
+-- Reference: proteine_Blast_resultaten (table: Blast_resultaten)
+ALTER TABLE Blast_resultaten ADD CONSTRAINT proteine_Blast_resultaten
+    FOREIGN KEY (acessiecode)
+    REFERENCES proteine (acessiecode)
+;
+
+CREATE TABLE Taxonomie (
+    rank_up int,
+    taxonomy_ID int,
+    naam varchar(50)  NOT NULL,
+    rang varchar(50)  NOT NULL,
+    CONSTRAINT Taxonomie_pk PRIMARY KEY (taxonomy_ID)
+);
+
+ALTER TABLE Taxonomie ADD CONSTRAINT Taxonomie_Taxonomie
+    FOREIGN KEY (rank_up)
+    REFERENCES Taxonomie (taxonomy_ID)
+;
+
+ALTER TABLE Blast_resultaten ADD CONSTRAINT
+    FOREIGN KEY (taxonomy_ID)
+    REFERENCES Taxonomie (taxonomy_ID)
+;
